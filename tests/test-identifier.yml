@@ -1,0 +1,33 @@
+name: Test identifier input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "1.2.3"
+          identifier: "beta"
+      - name: Assert inc-premajor with identifier
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-premajor }}
+        run: |
+          echo "actual inc-premajor: $ACTUAL"
+          if [ "$ACTUAL" != "2.0.0-beta.0" ]; then
+            echo "FAIL: expected inc-premajor='2.0.0-beta.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert inc-prerelease with identifier
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-prerelease }}
+        run: |
+          echo "actual inc-prerelease: $ACTUAL"
+          if [ "$ACTUAL" != "1.2.4-beta.0" ]; then
+            echo "FAIL: expected inc-prerelease='1.2.4-beta.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
