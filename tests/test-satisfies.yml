@@ -1,0 +1,23 @@
+name: Test semver satisfies range
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "1.5.0"
+          satisfies: ">=1.0.0 <2.0.0"
+      - name: Assert satisfies output (1.5.0 satisfies >=1.0.0 <2.0.0)
+        env:
+          ACTUAL: ${{ steps.semver.outputs.satisfies }}
+        run: |
+          echo "actual satisfies: $ACTUAL"
+          if [ "$ACTUAL" != "true" ]; then
+            echo "FAIL: expected satisfies to be 'true', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
