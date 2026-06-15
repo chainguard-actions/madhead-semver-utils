@@ -1,0 +1,53 @@
+name: Test semver diff
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver-diff-major
+        uses: .
+        with:
+          version: "2.0.0"
+          diff-with: "1.0.0"
+      - name: Assert diff-result is major
+        env:
+          ACTUAL: ${{ steps.semver-diff-major.outputs.diff-result }}
+        run: |
+          echo "actual diff-result: $ACTUAL"
+          if [ "$ACTUAL" != "major" ]; then
+            echo "FAIL: expected diff-result to be 'major', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - id: semver-diff-minor
+        uses: .
+        with:
+          version: "1.2.0"
+          diff-with: "1.1.0"
+      - name: Assert diff-result is minor
+        env:
+          ACTUAL: ${{ steps.semver-diff-minor.outputs.diff-result }}
+        run: |
+          echo "actual diff-result: $ACTUAL"
+          if [ "$ACTUAL" != "minor" ]; then
+            echo "FAIL: expected diff-result to be 'minor', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - id: semver-diff-patch
+        uses: .
+        with:
+          version: "1.2.3"
+          diff-with: "1.2.2"
+      - name: Assert diff-result is patch
+        env:
+          ACTUAL: ${{ steps.semver-diff-patch.outputs.diff-result }}
+        run: |
+          echo "actual diff-result: $ACTUAL"
+          if [ "$ACTUAL" != "patch" ]; then
+            echo "FAIL: expected diff-result to be 'patch', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
