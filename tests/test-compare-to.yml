@@ -1,0 +1,63 @@
+name: Test compare-to input
+on:
+  workflow_dispatch:
+jobs:
+  test-less-than:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "1.0.0"
+          compare-to: "2.0.0"
+      - name: Assert comparison-result is less-than
+        env:
+          ACTUAL: ${{ steps.semver.outputs.comparison-result }}
+        run: |
+          echo "actual comparison-result: $ACTUAL"
+          if [ "$ACTUAL" != "<" ]; then
+            echo "FAIL: expected comparison-result '<', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+
+  test-greater-than:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "2.0.0"
+          compare-to: "1.0.0"
+      - name: Assert comparison-result is greater-than
+        env:
+          ACTUAL: ${{ steps.semver.outputs.comparison-result }}
+        run: |
+          echo "actual comparison-result: $ACTUAL"
+          if [ "$ACTUAL" != ">" ]; then
+            echo "FAIL: expected comparison-result '>', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+
+  test-equal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "1.0.0"
+          compare-to: "1.0.0"
+      - name: Assert comparison-result is equal
+        env:
+          ACTUAL: ${{ steps.semver.outputs.comparison-result }}
+        run: |
+          echo "actual comparison-result: $ACTUAL"
+          if [ "$ACTUAL" != "=" ]; then
+            echo "FAIL: expected comparison-result '=', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
