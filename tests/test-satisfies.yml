@@ -1,0 +1,38 @@
+name: Test satisfies input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action-satisfies
+        uses: .
+        with:
+          version: "1.2.3"
+          satisfies: ">=1.0.0 <2.0.0"
+      - name: Assert satisfies is true
+        env:
+          ACTUAL: ${{ steps.action-satisfies.outputs.satisfies }}
+        run: |
+          echo "actual satisfies: $ACTUAL"
+          if [ "$ACTUAL" != "true" ]; then
+            echo "FAIL: expected satisfies 'true', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - id: action-not-satisfies
+        uses: .
+        with:
+          version: "2.0.0"
+          satisfies: ">=1.0.0 <2.0.0"
+      - name: Assert satisfies is false
+        env:
+          ACTUAL: ${{ steps.action-not-satisfies.outputs.satisfies }}
+        run: |
+          echo "actual satisfies: $ACTUAL"
+          if [ "$ACTUAL" != "false" ]; then
+            echo "FAIL: expected satisfies 'false', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"

@@ -1,0 +1,82 @@
+name: Test basic version parsing
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: "1.2.3"
+      - name: Assert release output
+        env:
+          ACTUAL: ${{ steps.action.outputs.release }}
+        run: |
+          echo "actual release: $ACTUAL"
+          if [ "$ACTUAL" != "1.2.3" ]; then
+            echo "FAIL: expected release '1.2.3', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert major output
+        env:
+          ACTUAL: ${{ steps.action.outputs.major }}
+        run: |
+          echo "actual major: $ACTUAL"
+          if [ "$ACTUAL" != "1" ]; then
+            echo "FAIL: expected major '1', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert minor output
+        env:
+          ACTUAL: ${{ steps.action.outputs.minor }}
+        run: |
+          echo "actual minor: $ACTUAL"
+          if [ "$ACTUAL" != "2" ]; then
+            echo "FAIL: expected minor '2', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert patch output
+        env:
+          ACTUAL: ${{ steps.action.outputs.patch }}
+        run: |
+          echo "actual patch: $ACTUAL"
+          if [ "$ACTUAL" != "3" ]; then
+            echo "FAIL: expected patch '3', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert inc-major output
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-major }}
+        run: |
+          echo "actual inc-major: $ACTUAL"
+          if [ "$ACTUAL" != "2.0.0" ]; then
+            echo "FAIL: expected inc-major '2.0.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert inc-minor output
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-minor }}
+        run: |
+          echo "actual inc-minor: $ACTUAL"
+          if [ "$ACTUAL" != "1.3.0" ]; then
+            echo "FAIL: expected inc-minor '1.3.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert inc-patch output
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-patch }}
+        run: |
+          echo "actual inc-patch: $ACTUAL"
+          if [ "$ACTUAL" != "1.2.4" ]; then
+            echo "FAIL: expected inc-patch '1.2.4', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"

@@ -1,0 +1,53 @@
+name: Test identifier input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: "1.2.3"
+          identifier: "beta"
+      - name: Assert inc-premajor output uses identifier
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-premajor }}
+        run: |
+          echo "actual inc-premajor: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected inc-premajor to be non-empty"
+            exit 1
+          fi
+          echo "PASS: inc-premajor is '$ACTUAL'"
+      - name: Assert inc-preminor output uses identifier
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-preminor }}
+        run: |
+          echo "actual inc-preminor: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected inc-preminor to be non-empty"
+            exit 1
+          fi
+          echo "PASS: inc-preminor is '$ACTUAL'"
+      - name: Assert inc-prepatch output uses identifier
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-prepatch }}
+        run: |
+          echo "actual inc-prepatch: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected inc-prepatch to be non-empty"
+            exit 1
+          fi
+          echo "PASS: inc-prepatch is '$ACTUAL'"
+      - name: Assert inc-prerelease output uses identifier
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-prerelease }}
+        run: |
+          echo "actual inc-prerelease: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected inc-prerelease to be non-empty"
+            exit 1
+          fi
+          echo "PASS: inc-prerelease is '$ACTUAL'"

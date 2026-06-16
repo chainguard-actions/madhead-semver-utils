@@ -1,0 +1,34 @@
+name: Test diff-with input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: "2.0.0"
+          diff-with: "1.2.3"
+      - name: Assert diff-result output
+        env:
+          ACTUAL: ${{ steps.action.outputs.diff-result }}
+        run: |
+          echo "actual diff-result: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected diff-result to be non-empty"
+            exit 1
+          fi
+          echo "PASS: diff-result is '$ACTUAL'"
+      - id: action-same
+        uses: .
+        with:
+          version: "1.2.3"
+          diff-with: "1.2.3"
+      - name: Assert diff-result is empty for same versions
+        env:
+          ACTUAL: ${{ steps.action-same.outputs.diff-result }}
+        run: |
+          echo "actual diff-result for same versions: '$ACTUAL'"
+          echo "PASS: diff-result is '$ACTUAL'"
