@@ -1,4 +1,4 @@
-name: Test basic version parsing
+name: Test version with v-prefix
 on:
   workflow_dispatch:
 jobs:
@@ -9,24 +9,15 @@ jobs:
       - id: semver
         uses: .
         with:
-          version: '1.2.3'
-      - name: Assert release
-        env:
-          ACTUAL: ${{ steps.semver.outputs.release }}
-        run: |
-          echo "actual release: $ACTUAL"
-          if [ "$ACTUAL" != "1.2.3" ]; then
-            echo "FAIL: expected release '1.2.3', got '$ACTUAL'"
-            exit 1
-          fi
-          echo "PASS"
+          version: 'v2.5.1'
+          lenient: 'true'
       - name: Assert major
         env:
           ACTUAL: ${{ steps.semver.outputs.major }}
         run: |
           echo "actual major: $ACTUAL"
-          if [ "$ACTUAL" != "1" ]; then
-            echo "FAIL: expected major '1', got '$ACTUAL'"
+          if [ "$ACTUAL" != "2" ]; then
+            echo "FAIL: expected major '2', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS"
@@ -35,8 +26,8 @@ jobs:
           ACTUAL: ${{ steps.semver.outputs.minor }}
         run: |
           echo "actual minor: $ACTUAL"
-          if [ "$ACTUAL" != "2" ]; then
-            echo "FAIL: expected minor '2', got '$ACTUAL'"
+          if [ "$ACTUAL" != "5" ]; then
+            echo "FAIL: expected minor '5', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS"
@@ -45,8 +36,18 @@ jobs:
           ACTUAL: ${{ steps.semver.outputs.patch }}
         run: |
           echo "actual patch: $ACTUAL"
-          if [ "$ACTUAL" != "3" ]; then
-            echo "FAIL: expected patch '3', got '$ACTUAL'"
+          if [ "$ACTUAL" != "1" ]; then
+            echo "FAIL: expected patch '1', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert release
+        env:
+          ACTUAL: ${{ steps.semver.outputs.release }}
+        run: |
+          echo "actual release: $ACTUAL"
+          if [ "$ACTUAL" != "2.5.1" ]; then
+            echo "FAIL: expected release '2.5.1', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS"

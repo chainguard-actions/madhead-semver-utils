@@ -1,0 +1,42 @@
+name: PR to main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  pr_main:
+    name: PR to main
+    runs-on: ubuntu-latest
+    if: ${{ github.event.sender.login != 'dependabot[bot]' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - id: base-version
+        run: |
+          raw_version=$(node -p "require('./package.json').version")
+          safe_version=$(printf '%s' "$raw_version" | tr -d '\n\r')
+          echo "version=$safe_version" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - id: new-version
+        run: |
+          raw_version=$(node -p "require('./package.json').version")
+          safe_version=$(printf '%s' "$raw_version" | tr -d '\n\r')
+          echo "version=$safe_version" >> "$GITHUB_OUTPUT"
+
+      - uses: madhead/semver-utils@4cf918affe9106ea59f86c6250e5ec4570ac4389 # latest
+        id: comparison
+        with:
+          version: ${{ steps.new-version.outputs.version }}
+          compare-to: ${{ steps.base-version.outputs.version }}
+
+      - env:
+          COMPARISON_RESULT: ${{ steps.comparison.outputs.comparison-result }}
+        run: '[[ ">" == "$COMPARISON_RESULT" ]]'

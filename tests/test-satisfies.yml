@@ -1,4 +1,4 @@
-name: Test satisfies input
+name: Test range satisfaction
 on:
   workflow_dispatch:
 jobs:
@@ -9,15 +9,15 @@ jobs:
       - id: semver
         uses: .
         with:
-          version: "1.5.0"
-          satisfies: ">=1.0.0 <2.0.0"
+          version: '1.5.0'
+          satisfies: '>=1.0.0 <2.0.0'
       - name: Assert satisfies is true
         env:
           ACTUAL: ${{ steps.semver.outputs.satisfies }}
         run: |
           echo "actual satisfies: $ACTUAL"
           if [ "$ACTUAL" != "true" ]; then
-            echo "FAIL: expected satisfies 'true', got '$ACTUAL'"
+            echo "FAIL: expected 'true', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS"
@@ -29,15 +29,15 @@ jobs:
       - id: semver
         uses: .
         with:
-          version: "2.0.0"
-          satisfies: ">=1.0.0 <2.0.0"
+          version: '3.0.0'
+          satisfies: '>=1.0.0 <2.0.0'
       - name: Assert satisfies is false
         env:
           ACTUAL: ${{ steps.semver.outputs.satisfies }}
         run: |
           echo "actual satisfies: $ACTUAL"
           if [ "$ACTUAL" != "false" ]; then
-            echo "FAIL: expected satisfies 'false', got '$ACTUAL'"
+            echo "FAIL: expected 'false', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS"

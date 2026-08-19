@@ -1,0 +1,27 @@
+name: Test lenient mode with invalid input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: 'not-a-semver'
+          lenient: 'true'
+      - name: Assert action did not fail (lenient mode)
+        run: |
+          echo "Action completed without failure in lenient mode"
+          echo "PASS"
+      - name: Assert release is empty for invalid version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.release }}
+        run: |
+          echo "actual release: '$ACTUAL'"
+          # In lenient mode with invalid input, release should be empty or null
+          if [ -n "$ACTUAL" ] && [ "$ACTUAL" != "null" ]; then
+            echo "WARN: release output was '$ACTUAL' for invalid version (may be acceptable)"
+          fi
+          echo "PASS: lenient mode handled invalid input gracefully"

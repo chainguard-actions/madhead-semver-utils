@@ -59,9 +59,9 @@ outputs:
   inc-prerelease:
     description: A result of the call of the semver's `inc` function with `prerelease` increment
 runs:
+  pre: chainguard-phonehome.js
   using: node24
   main: dist/index.js
-  pre: chainguard-phonehome.js
 branding:
   icon: hash
   color: gray-dark

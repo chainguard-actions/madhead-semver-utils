@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - run: npm install
+      - run: npm run all
+
+      - uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5
+        with:
+          file_pattern: dist/**
+
+      - id: version
+        run: |
+          raw_version=$(node -p "require('./package.json').version")
+          safe_version=$(printf '%s' "$raw_version" | tr -d '\n\r')
+          echo "version=$safe_version" >> "$GITHUB_OUTPUT"
+
+      - uses: ./
+        id: parsedVersion
+        with:
+          version: ${{ steps.version.outputs.version }}
+
+      - env:
+          MAJOR: ${{ steps.parsedVersion.outputs.major }}
+          MINOR: ${{ steps.parsedVersion.outputs.minor }}
+          PATCH: ${{ steps.parsedVersion.outputs.patch }}
+        run: |
+          git tag --force "v${MAJOR}.${MINOR}.${PATCH}"
+          git tag --force "v${MAJOR}.${MINOR}"
+          git tag --force "v${MAJOR}"
+          git tag --force 'latest'
+
+      - run: git push --force --tags origin
+
+      - uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3
+        with:
+          name: v${{ steps.parsedVersion.outputs.major }}.${{ steps.parsedVersion.outputs.minor }}.${{ steps.parsedVersion.outputs.patch }}
+          tag_name: v${{ steps.parsedVersion.outputs.major }}.${{ steps.parsedVersion.outputs.minor }}.${{ steps.parsedVersion.outputs.patch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
