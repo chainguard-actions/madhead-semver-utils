@@ -1,38 +1,63 @@
-name: Test satisfies input
+name: Test satisfies range check
 on:
   workflow_dispatch:
 jobs:
-  test:
+  test-satisfies-true:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action-satisfies
+      - id: semver
         uses: .
         with:
-          version: "1.2.3"
+          version: "1.5.0"
           satisfies: ">=1.0.0 <2.0.0"
       - name: Assert satisfies is true
         env:
-          ACTUAL: ${{ steps.action-satisfies.outputs.satisfies }}
+          ACTUAL: ${{ steps.semver.outputs.satisfies }}
         run: |
           echo "actual satisfies: $ACTUAL"
           if [ "$ACTUAL" != "true" ]; then
-            echo "FAIL: expected satisfies 'true', got '$ACTUAL'"
+            echo "FAIL: expected 'true', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS"
-      - id: action-not-satisfies
+
+  test-satisfies-false:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
         uses: .
         with:
-          version: "2.0.0"
+          version: "3.0.0"
           satisfies: ">=1.0.0 <2.0.0"
       - name: Assert satisfies is false
         env:
-          ACTUAL: ${{ steps.action-not-satisfies.outputs.satisfies }}
+          ACTUAL: ${{ steps.semver.outputs.satisfies }}
         run: |
           echo "actual satisfies: $ACTUAL"
           if [ "$ACTUAL" != "false" ]; then
-            echo "FAIL: expected satisfies 'false', got '$ACTUAL'"
+            echo "FAIL: expected 'false', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+
+  test-satisfies-exact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "2.3.4"
+          satisfies: "~2.3.0"
+      - name: Assert satisfies tilde range
+        env:
+          ACTUAL: ${{ steps.semver.outputs.satisfies }}
+        run: |
+          echo "actual satisfies: $ACTUAL"
+          if [ "$ACTUAL" != "true" ]; then
+            echo "FAIL: expected 'true', got '$ACTUAL'"
             exit 1
           fi
           echo "PASS"

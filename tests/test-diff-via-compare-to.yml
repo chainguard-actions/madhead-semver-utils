@@ -1,0 +1,33 @@
+name: Test version diff via compare-to
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "2.1.0"
+          compare-to: "1.0.0"
+      - name: Assert comparison-result
+        env:
+          ACTUAL: ${{ steps.semver.outputs.comparison-result }}
+        run: |
+          echo "actual comparison-result: $ACTUAL"
+          if [ "$ACTUAL" != ">" ]; then
+            echo "FAIL: expected comparison-result '>', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert diff-result is major (diffed with compare-to)
+        env:
+          ACTUAL: ${{ steps.semver.outputs.diff-result }}
+        run: |
+          echo "actual diff-result: $ACTUAL"
+          if [ "$ACTUAL" != "major" ]; then
+            echo "FAIL: expected diff-result 'major', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
