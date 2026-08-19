@@ -1,0 +1,62 @@
+name: Test semver build metadata parsing
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: '1.2.3+build.42'
+      - name: Assert release
+        env:
+          ACTUAL: ${{ steps.semver.outputs.release }}
+        run: |
+          echo "actual release: $ACTUAL"
+          if [ "$ACTUAL" != "1.2.3" ]; then
+            echo "FAIL: expected release '1.2.3', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert build
+        env:
+          ACTUAL: ${{ steps.semver.outputs.build }}
+        run: |
+          echo "actual build: $ACTUAL"
+          if [ "$ACTUAL" != "build.42" ]; then
+            echo "FAIL: expected build 'build.42', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert build-parts count
+        env:
+          ACTUAL: ${{ steps.semver.outputs.build-parts }}
+        run: |
+          echo "actual build-parts: $ACTUAL"
+          if [ "$ACTUAL" != "2" ]; then
+            echo "FAIL: expected build-parts '2', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert build-0
+        env:
+          ACTUAL: ${{ steps.semver.outputs.build-0 }}
+        run: |
+          echo "actual build-0: $ACTUAL"
+          if [ "$ACTUAL" != "build" ]; then
+            echo "FAIL: expected build-0 'build', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert build-1
+        env:
+          ACTUAL: ${{ steps.semver.outputs.build-1 }}
+        run: |
+          echo "actual build-1: $ACTUAL"
+          if [ "$ACTUAL" != "42" ]; then
+            echo "FAIL: expected build-1 '42', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"

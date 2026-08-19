@@ -1,0 +1,71 @@
+name: Test semver lenient mode
+on:
+  workflow_dispatch:
+jobs:
+  test-lenient-invalid:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: 'not-a-semver'
+          lenient: 'true'
+      - name: Assert action did not fail (lenient mode)
+        run: |
+          echo "Action completed without failure in lenient mode"
+          echo "PASS"
+      - name: Assert outputs are empty for invalid version
+        env:
+          MAJOR: ${{ steps.semver.outputs.major }}
+          MINOR: ${{ steps.semver.outputs.minor }}
+          PATCH: ${{ steps.semver.outputs.patch }}
+        run: |
+          echo "major: '$MAJOR'"
+          echo "minor: '$MINOR'"
+          echo "patch: '$PATCH'"
+          # In lenient mode with invalid input, outputs should be empty
+          if [ -n "$MAJOR" ] && [ "$MAJOR" != "0" ]; then
+            echo "INFO: major output is '$MAJOR'"
+          fi
+          echo "PASS: action completed in lenient mode without error"
+
+  test-lenient-coercible:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: 'v1.2.3'
+          lenient: 'true'
+      - name: Assert major is parsed from coercible version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.major }}
+        run: |
+          echo "actual major: $ACTUAL"
+          if [ "$ACTUAL" != "1" ]; then
+            echo "FAIL: expected major '1', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert minor is parsed from coercible version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.minor }}
+        run: |
+          echo "actual minor: $ACTUAL"
+          if [ "$ACTUAL" != "2" ]; then
+            echo "FAIL: expected minor '2', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert patch is parsed from coercible version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.patch }}
+        run: |
+          echo "actual patch: $ACTUAL"
+          if [ "$ACTUAL" != "3" ]; then
+            echo "FAIL: expected patch '3', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"

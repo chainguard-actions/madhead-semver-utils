@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - run: npm install
+      - run: npm run all
+
+      - uses: stefanzweifel/git-auto-commit-action@3ea6ae190baf489ba007f7c92608f33ce20ef04a # v4.16.0
+        with:
+          file_pattern: dist/**
+
+      - run: node -p "'version=' + require('./package.json').version" >> $GITHUB_OUTPUT
+        id: version
+
+      - uses: ./
+        id: parsedVersion
+        with:
+          version: ${{ steps.version.outputs.version }}
+
+      - env:
+          MAJOR: ${{ steps.parsedVersion.outputs.major }}
+          MINOR: ${{ steps.parsedVersion.outputs.minor }}
+          PATCH: ${{ steps.parsedVersion.outputs.patch }}
+        run: |
+          git tag --force "v${MAJOR}.${MINOR}.${PATCH}"
+          git tag --force "v${MAJOR}.${MINOR}"
+          git tag --force "v${MAJOR}"
+          git tag --force 'latest'
+
+      - run: git push --force --tags origin
+
+      - uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+        with:
+          name: v${{ steps.parsedVersion.outputs.major }}.${{ steps.parsedVersion.outputs.minor }}.${{ steps.parsedVersion.outputs.patch }}
+          tag_name: v${{ steps.parsedVersion.outputs.major }}.${{ steps.parsedVersion.outputs.minor }}.${{ steps.parsedVersion.outputs.patch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

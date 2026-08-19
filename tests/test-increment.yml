@@ -1,0 +1,82 @@
+name: Test semver increment outputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: '1.2.3'
+      - name: Assert inc-major
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-major }}
+        run: |
+          echo "actual inc-major: $ACTUAL"
+          if [ "$ACTUAL" != "2.0.0" ]; then
+            echo "FAIL: expected inc-major '2.0.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert inc-minor
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-minor }}
+        run: |
+          echo "actual inc-minor: $ACTUAL"
+          if [ "$ACTUAL" != "1.3.0" ]; then
+            echo "FAIL: expected inc-minor '1.3.0', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert inc-patch
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-patch }}
+        run: |
+          echo "actual inc-patch: $ACTUAL"
+          if [ "$ACTUAL" != "1.2.4" ]; then
+            echo "FAIL: expected inc-patch '1.2.4', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert inc-premajor
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-premajor }}
+        run: |
+          echo "actual inc-premajor: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected inc-premajor to be non-empty"
+            exit 1
+          fi
+          echo "PASS: inc-premajor=$ACTUAL"
+      - name: Assert inc-preminor
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-preminor }}
+        run: |
+          echo "actual inc-preminor: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected inc-preminor to be non-empty"
+            exit 1
+          fi
+          echo "PASS: inc-preminor=$ACTUAL"
+      - name: Assert inc-prepatch
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-prepatch }}
+        run: |
+          echo "actual inc-prepatch: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected inc-prepatch to be non-empty"
+            exit 1
+          fi
+          echo "PASS: inc-prepatch=$ACTUAL"
+      - name: Assert inc-prerelease
+        env:
+          ACTUAL: ${{ steps.semver.outputs.inc-prerelease }}
+        run: |
+          echo "actual inc-prerelease: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected inc-prerelease to be non-empty"
+            exit 1
+          fi
+          echo "PASS: inc-prerelease=$ACTUAL"
