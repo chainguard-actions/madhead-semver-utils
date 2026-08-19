@@ -1,0 +1,57 @@
+name: Test lenient mode with invalid version
+on:
+  workflow_dispatch:
+jobs:
+  test-lenient-default:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "not-a-semver"
+          lenient: "true"
+      - name: Assert action did not fail with lenient mode
+        run: |
+          echo "Action completed without failure in lenient mode"
+          echo "PASS"
+
+  test-lenient-with-v-prefix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: "v1.2.3"
+          lenient: "true"
+      - name: Assert major parsed from v-prefixed version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.major }}
+        run: |
+          echo "actual major: $ACTUAL"
+          if [ "$ACTUAL" != "1" ]; then
+            echo "FAIL: expected major '1' from v-prefixed version, got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert minor parsed from v-prefixed version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.minor }}
+        run: |
+          echo "actual minor: $ACTUAL"
+          if [ "$ACTUAL" != "2" ]; then
+            echo "FAIL: expected minor '2' from v-prefixed version, got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert patch parsed from v-prefixed version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.patch }}
+        run: |
+          echo "actual patch: $ACTUAL"
+          if [ "$ACTUAL" != "3" ]; then
+            echo "FAIL: expected patch '3' from v-prefixed version, got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"

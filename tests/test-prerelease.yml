@@ -1,0 +1,62 @@
+name: Test pre-release version parsing
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: '1.2.3-alpha.1'
+      - name: Assert release output
+        env:
+          ACTUAL: ${{ steps.semver.outputs.release }}
+        run: |
+          echo "actual release: $ACTUAL"
+          if [ "$ACTUAL" != "1.2.3" ]; then
+            echo "FAIL: expected release '1.2.3', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert prerelease output
+        env:
+          ACTUAL: ${{ steps.semver.outputs.prerelease }}
+        run: |
+          echo "actual prerelease: $ACTUAL"
+          if [ "$ACTUAL" != "alpha.1" ]; then
+            echo "FAIL: expected prerelease 'alpha.1', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert prerelease-parts count
+        env:
+          ACTUAL: ${{ steps.semver.outputs.prerelease-parts }}
+        run: |
+          echo "actual prerelease-parts: $ACTUAL"
+          if [ "$ACTUAL" != "2" ]; then
+            echo "FAIL: expected prerelease-parts '2', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert prerelease-0 component
+        env:
+          ACTUAL: ${{ steps.semver.outputs.prerelease-0 }}
+        run: |
+          echo "actual prerelease-0: $ACTUAL"
+          if [ "$ACTUAL" != "alpha" ]; then
+            echo "FAIL: expected prerelease-0 'alpha', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert prerelease-1 component
+        env:
+          ACTUAL: ${{ steps.semver.outputs.prerelease-1 }}
+        run: |
+          echo "actual prerelease-1: $ACTUAL"
+          if [ "$ACTUAL" != "1" ]; then
+            echo "FAIL: expected prerelease-1 '1', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
