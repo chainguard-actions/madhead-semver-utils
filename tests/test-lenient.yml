@@ -1,0 +1,57 @@
+name: Test lenient mode with invalid version
+on:
+  workflow_dispatch:
+jobs:
+  test-lenient-true:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: 'not-a-semver'
+          lenient: 'true'
+      - name: Assert action did not fail with lenient=true
+        run: |
+          echo "Action completed without failure in lenient mode"
+          echo "PASS"
+
+  test-lenient-coercion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: semver
+        uses: .
+        with:
+          version: 'v1.2.3'
+          lenient: 'true'
+      - name: Assert major is parsed from coerced version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.major }}
+        run: |
+          echo "major: $ACTUAL"
+          if [ "$ACTUAL" != "1" ]; then
+            echo "FAIL: expected major '1', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert minor is parsed from coerced version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.minor }}
+        run: |
+          echo "minor: $ACTUAL"
+          if [ "$ACTUAL" != "2" ]; then
+            echo "FAIL: expected minor '2', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert patch is parsed from coerced version
+        env:
+          ACTUAL: ${{ steps.semver.outputs.patch }}
+        run: |
+          echo "patch: $ACTUAL"
+          if [ "$ACTUAL" != "3" ]; then
+            echo "FAIL: expected patch '3', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"

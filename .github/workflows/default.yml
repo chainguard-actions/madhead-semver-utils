@@ -1,0 +1,162 @@
+name: Default
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions: {}
+
+jobs:
+  default:
+    name: Default
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - run: npm install
+      - run: npm run all
+
+      - uses: ./
+        id: test-1
+        with:
+          version: wrong
+          lenient: false
+        continue-on-error: true
+      - env:
+          OUTCOME: ${{ steps.test-1.outcome }}
+          CONCLUSION: ${{ steps.test-1.conclusion }}
+        run: '[[ "failure" == "$OUTCOME" ]]'
+      - env:
+          OUTCOME: ${{ steps.test-1.outcome }}
+          CONCLUSION: ${{ steps.test-1.conclusion }}
+        run: '[[ "success" == "$CONCLUSION" ]]'
+
+      - uses: ./
+        id: test-2
+        with:
+          version: wrong
+          lenient: 'false'
+        continue-on-error: true
+      - env:
+          OUTCOME: ${{ steps.test-2.outcome }}
+          CONCLUSION: ${{ steps.test-2.conclusion }}
+        run: '[[ "failure" == "$OUTCOME" ]]'
+      - env:
+          OUTCOME: ${{ steps.test-2.outcome }}
+          CONCLUSION: ${{ steps.test-2.conclusion }}
+        run: '[[ "success" == "$CONCLUSION" ]]'
+
+      - uses: ./
+        id: test-3
+        with:
+          version: wrong
+      - env:
+          OUT_RELEASE: ${{ steps.test-3.outputs.release }}
+          OUT_MAJOR: ${{ steps.test-3.outputs.major }}
+          OUT_MINOR: ${{ steps.test-3.outputs.minor }}
+          OUT_PATCH: ${{ steps.test-3.outputs.patch }}
+          OUT_OTHER: ${{ steps.test-3.outputs.any_other_property }}
+        run: |
+          [[ "" == "$OUT_RELEASE" ]]
+          [[ "" == "$OUT_MAJOR" ]]
+          [[ "" == "$OUT_MINOR" ]]
+          [[ "" == "$OUT_PATCH" ]]
+          [[ "" == "$OUT_OTHER" ]]
+
+      - uses: ./
+        id: test-4
+        with:
+          version: wrong
+          lenient: true
+      - env:
+          OUT_RELEASE: ${{ steps.test-4.outputs.release }}
+          OUT_MAJOR: ${{ steps.test-4.outputs.major }}
+          OUT_MINOR: ${{ steps.test-4.outputs.minor }}
+          OUT_PATCH: ${{ steps.test-4.outputs.patch }}
+          OUT_OTHER: ${{ steps.test-4.outputs.any_other_property }}
+        run: |
+          [[ "" == "$OUT_RELEASE" ]]
+          [[ "" == "$OUT_MAJOR" ]]
+          [[ "" == "$OUT_MINOR" ]]
+          [[ "" == "$OUT_PATCH" ]]
+          [[ "" == "$OUT_OTHER" ]]
+
+      - uses: ./
+        id: test-5
+        with:
+          version: 1.2.3-alpha.gamma+4.5.6
+      - env:
+          OUT_RELEASE: ${{ steps.test-5.outputs.release }}
+          OUT_MAJOR: ${{ steps.test-5.outputs.major }}
+          OUT_MINOR: ${{ steps.test-5.outputs.minor }}
+          OUT_PATCH: ${{ steps.test-5.outputs.patch }}
+          OUT_PRERELEASE: ${{ steps.test-5.outputs.prerelease }}
+          OUT_PRERELEASE_PARTS: ${{ steps.test-5.outputs.prerelease-parts }}
+          OUT_PRERELEASE_0: ${{ steps.test-5.outputs.prerelease-0 }}
+          OUT_PRERELEASE_1: ${{ steps.test-5.outputs.prerelease-1 }}
+          OUT_BUILD: ${{ steps.test-5.outputs.build }}
+          OUT_BUILD_PARTS: ${{ steps.test-5.outputs.build-parts }}
+          OUT_BUILD_0: ${{ steps.test-5.outputs.build-0 }}
+          OUT_BUILD_1: ${{ steps.test-5.outputs.build-1 }}
+          OUT_BUILD_2: ${{ steps.test-5.outputs.build-2 }}
+        run: |
+          [[ "1.2.3"       == "$OUT_RELEASE" ]]
+          [[ "1"           == "$OUT_MAJOR" ]]
+          [[ "2"           == "$OUT_MINOR" ]]
+          [[ "3"           == "$OUT_PATCH" ]]
+          [[ "alpha.gamma" == "$OUT_PRERELEASE" ]]
+          [[ "2"           == "$OUT_PRERELEASE_PARTS" ]]
+          [[ "alpha"       == "$OUT_PRERELEASE_0" ]]
+          [[ "gamma"       == "$OUT_PRERELEASE_1" ]]
+          [[ "4.5.6"       == "$OUT_BUILD" ]]
+          [[ "3"           == "$OUT_BUILD_PARTS" ]]
+          [[ "4"           == "$OUT_BUILD_0" ]]
+          [[ "5"           == "$OUT_BUILD_1" ]]
+          [[ "6"           == "$OUT_BUILD_2" ]]
+
+      - uses: ./
+        id: test-6
+        with:
+          version: 1.0.0
+          compare-to: 2.0.0
+      - env:
+          COMPARISON_RESULT: ${{ steps.test-6.outputs.comparison-result }}
+        run: '[[ "<" == "$COMPARISON_RESULT" ]]'
+
+      - uses: ./
+        id: test-7
+        with:
+          version: 1.2.3
+          satisfies: 1.x
+      - env:
+          SATISFIES: ${{ steps.test-7.outputs.satisfies }}
+        run: '[[ "true" == "$SATISFIES" ]]'
+
+      - uses: ./
+        id: test-8
+        with:
+          version: 1.2.3
+      - env:
+          OUT_INC_MAJOR: ${{ steps.test-8.outputs.inc-major }}
+          OUT_INC_PREMAJOR: ${{ steps.test-8.outputs.inc-premajor }}
+          OUT_INC_MINOR: ${{ steps.test-8.outputs.inc-minor }}
+          OUT_INC_PREMINOR: ${{ steps.test-8.outputs.inc-preminor }}
+          OUT_INC_PATCH: ${{ steps.test-8.outputs.inc-patch }}
+          OUT_INC_PREPATCH: ${{ steps.test-8.outputs.inc-prepatch }}
+          OUT_INC_PRERELEASE: ${{ steps.test-8.outputs.inc-prerelease }}
+        run: |
+          [[ "2.0.0"   == "$OUT_INC_MAJOR" ]]
+          [[ "2.0.0-0" == "$OUT_INC_PREMAJOR" ]]
+          [[ "1.3.0"   == "$OUT_INC_MINOR" ]]
+          [[ "1.3.0-0" == "$OUT_INC_PREMINOR" ]]
+          [[ "1.2.4"   == "$OUT_INC_PATCH" ]]
+          [[ "1.2.4-0" == "$OUT_INC_PREPATCH" ]]
+          [[ "1.2.4-0" == "$OUT_INC_PRERELEASE" ]]
+
+  actions-typing:
+    name: Validate actions typing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: typesafegithub/github-actions-typing@21db25f90324def9328034891ea446b023b8ea77 # v1
