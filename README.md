@@ -13,6 +13,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v4.2.0 | [`v4.2.0`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v4.2.0) | [`09b7021`](https://github.com/madhead/semver-utils/commit/09b702153794844b4da0e7b23ba523ef13484d3d) |
 | v4.3.0 | [`v4.3.0`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v4.3.0) | [`36d1e0e`](https://github.com/madhead/semver-utils/commit/36d1e0ed361bd7b4b77665de8093092eaeabe6ba) |
 | v5.0.0 | [`v5.0.0`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v5.0.0) | [`4cf918a`](https://github.com/madhead/semver-utils/commit/4cf918affe9106ea59f86c6250e5ec4570ac4389) |
+| v5.1.0 | [`v5.1.0`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v5.1.0) | [`2077fbf`](https://github.com/madhead/semver-utils/commit/2077fbfc5afab7fa90374e866548efbef28068d2) |
 
 ## Privacy
 
