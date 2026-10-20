@@ -1,0 +1,69 @@
+name: Test version increment with identifier
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: "1.2.3"
+          identifier: "beta"
+      - name: Assert inc-premajor with identifier
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-premajor }}
+        run: |
+          echo "inc-premajor: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty inc-premajor"
+            exit 1
+          fi
+          if echo "$ACTUAL" | grep -qv "beta"; then
+            echo "FAIL: expected 'beta' in inc-premajor, got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: $ACTUAL"
+      - name: Assert inc-preminor with identifier
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-preminor }}
+        run: |
+          echo "inc-preminor: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty inc-preminor"
+            exit 1
+          fi
+          if echo "$ACTUAL" | grep -qv "beta"; then
+            echo "FAIL: expected 'beta' in inc-preminor, got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: $ACTUAL"
+      - name: Assert inc-prepatch with identifier
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-prepatch }}
+        run: |
+          echo "inc-prepatch: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty inc-prepatch"
+            exit 1
+          fi
+          if echo "$ACTUAL" | grep -qv "beta"; then
+            echo "FAIL: expected 'beta' in inc-prepatch, got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: $ACTUAL"
+      - name: Assert inc-prerelease with identifier
+        env:
+          ACTUAL: ${{ steps.action.outputs.inc-prerelease }}
+        run: |
+          echo "inc-prerelease: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected non-empty inc-prerelease"
+            exit 1
+          fi
+          if echo "$ACTUAL" | grep -qv "beta"; then
+            echo "FAIL: expected 'beta' in inc-prerelease, got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: $ACTUAL"

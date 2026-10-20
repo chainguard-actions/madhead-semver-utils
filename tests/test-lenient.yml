@@ -1,0 +1,38 @@
+name: Test lenient mode with invalid version
+on:
+  workflow_dispatch:
+jobs:
+  test-lenient-true:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: "not-a-semver"
+          lenient: "true"
+      - name: Assert action did not fail with lenient=true
+        run: |
+          echo "Action completed without failure in lenient mode"
+          echo "PASS"
+
+  test-lenient-false-invalid:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          version: "not-a-semver"
+          lenient: "false"
+      - name: Assert action failed with lenient=false and invalid version
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail with lenient=false and invalid version, got '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed on invalid version with lenient=false"
