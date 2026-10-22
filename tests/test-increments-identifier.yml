@@ -1,0 +1,33 @@
+name: Test increments with identifier
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: 1.2.3
+          identifier: beta
+      - name: Assert increment outputs
+        env:
+          MAJOR: ${{ steps.action.outputs.inc-major }}
+          PREMAJOR: ${{ steps.action.outputs.inc-premajor }}
+          PREMINOR: ${{ steps.action.outputs.inc-preminor }}
+          PREPATCH: ${{ steps.action.outputs.inc-prepatch }}
+          PRERELEASE: ${{ steps.action.outputs.inc-prerelease }}
+        run: |
+          fail=0
+          check() {
+            echo "$1: actual='$2' expected='$3'"
+            if [ "$2" != "$3" ]; then echo "FAIL: $1"; fail=1; fi
+          }
+          check inc-major "$MAJOR" "2.0.0"
+          check inc-premajor "$PREMAJOR" "2.0.0-beta.0"
+          check inc-preminor "$PREMINOR" "1.3.0-beta.0"
+          check inc-prepatch "$PREPATCH" "1.2.4-beta.0"
+          check inc-prerelease "$PRERELEASE" "1.2.4-beta.0"
+          [ "$fail" = 0 ] || exit 1
+          echo "PASS"

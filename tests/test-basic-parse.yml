@@ -1,0 +1,50 @@
+name: Test basic parsing
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: 1.2.3-alpha.4+build.5
+      - name: Assert outputs
+        env:
+          RELEASE: ${{ steps.action.outputs.release }}
+          MAJOR: ${{ steps.action.outputs.major }}
+          MINOR: ${{ steps.action.outputs.minor }}
+          PATCH: ${{ steps.action.outputs.patch }}
+          PRE: ${{ steps.action.outputs.prerelease }}
+          PRE_PARTS: ${{ steps.action.outputs.prerelease-parts }}
+          PRE0: ${{ steps.action.outputs.prerelease-0 }}
+          PRE1: ${{ steps.action.outputs.prerelease-1 }}
+          BUILD: ${{ steps.action.outputs.build }}
+          BUILD_PARTS: ${{ steps.action.outputs.build-parts }}
+          BUILD0: ${{ steps.action.outputs.build-0 }}
+          BUILD1: ${{ steps.action.outputs.build-1 }}
+          CMP: ${{ steps.action.outputs.comparison-result }}
+          SAT: ${{ steps.action.outputs.satisfies }}
+        run: |
+          fail=0
+          check() {
+            echo "$1: actual='$2' expected='$3'"
+            if [ "$2" != "$3" ]; then echo "FAIL: $1"; fail=1; fi
+          }
+          check release "$RELEASE" "1.2.3"
+          check major "$MAJOR" "1"
+          check minor "$MINOR" "2"
+          check patch "$PATCH" "3"
+          check prerelease "$PRE" "alpha.4"
+          check prerelease-parts "$PRE_PARTS" "2"
+          check prerelease-0 "$PRE0" "alpha"
+          check prerelease-1 "$PRE1" "4"
+          check build "$BUILD" "build.5"
+          check build-parts "$BUILD_PARTS" "2"
+          check build-0 "$BUILD0" "build"
+          check build-1 "$BUILD1" "5"
+          check comparison-result "$CMP" ""
+          check satisfies "$SAT" ""
+          [ "$fail" = 0 ] || exit 1
+          echo "PASS"

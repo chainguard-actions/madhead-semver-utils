@@ -1,0 +1,23 @@
+name: Test invalid version (lenient default)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: not-a-version
+      - name: Assert no outputs and success
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          RELEASE: ${{ steps.action.outputs.release }}
+          MAJOR: ${{ steps.action.outputs.major }}
+          INC: ${{ steps.action.outputs.inc-major }}
+        run: |
+          echo "outcome: $OUTCOME release: '$RELEASE' major: '$MAJOR' inc-major: '$INC'"
+          if [ "$OUTCOME" != "success" ]; then echo "FAIL: expected success"; exit 1; fi
+          if [ -n "$RELEASE$MAJOR$INC" ]; then echo "FAIL: expected empty outputs"; exit 1; fi
+          echo "PASS"
