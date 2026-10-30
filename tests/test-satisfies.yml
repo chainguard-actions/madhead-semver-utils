@@ -1,0 +1,28 @@
+name: Test satisfies
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: in_range
+        uses: .
+        with:
+          version: 1.2.3
+          satisfies: ^1.0.0
+      - id: out_of_range
+        uses: .
+        with:
+          version: 1.2.3
+          satisfies: '>=2.0.0'
+      - name: Assert outputs
+        env:
+          IN_RANGE: ${{ steps.in_range.outputs.satisfies }}
+          OUT_RANGE: ${{ steps.out_of_range.outputs.satisfies }}
+        run: |
+          echo "in_range: $IN_RANGE"
+          echo "out_of_range: $OUT_RANGE"
+          if [ "$IN_RANGE" != "true" ]; then echo "FAIL: expected true"; exit 1; fi
+          if [ "$OUT_RANGE" != "false" ]; then echo "FAIL: expected false"; exit 1; fi
+          echo "PASS"

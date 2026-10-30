@@ -1,0 +1,33 @@
+name: Test identifier
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: 1.2.3
+          identifier: beta
+      - name: Assert outputs
+        env:
+          INC_MAJOR: ${{ steps.action.outputs.inc-major }}
+          INC_PREMAJOR: ${{ steps.action.outputs.inc-premajor }}
+          INC_PREMINOR: ${{ steps.action.outputs.inc-preminor }}
+          INC_PREPATCH: ${{ steps.action.outputs.inc-prepatch }}
+          INC_PRERELEASE: ${{ steps.action.outputs.inc-prerelease }}
+        run: |
+          fail=0
+          check() {
+            echo "$1: actual='$2' expected='$3'"
+            if [ "$2" != "$3" ]; then echo "FAIL: $1"; fail=1; fi
+          }
+          check inc-major "$INC_MAJOR" "2.0.0"
+          check inc-premajor "$INC_PREMAJOR" "2.0.0-beta.0"
+          check inc-preminor "$INC_PREMINOR" "1.3.0-beta.0"
+          check inc-prepatch "$INC_PREPATCH" "1.2.4-beta.0"
+          check inc-prerelease "$INC_PRERELEASE" "1.2.4-beta.0"
+          if [ "$fail" != "0" ]; then exit 1; fi
+          echo "PASS"
