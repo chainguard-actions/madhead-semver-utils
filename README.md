@@ -15,7 +15,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v5.0.0 | [`v5.0.0`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v5.0.0) | [`4cf918a`](https://github.com/madhead/semver-utils/commit/4cf918affe9106ea59f86c6250e5ec4570ac4389) | — |
 | v5.1.0 | [`v5.1.0`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v5.1.0) | [`2077fbf`](https://github.com/madhead/semver-utils/commit/2077fbfc5afab7fa90374e866548efbef28068d2) | — |
 | v5.1.1 | [`v5.1.1`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v5.1.1) | [`092ff2b`](https://github.com/madhead/semver-utils/commit/092ff2bc46cae343afb90c5efbd606411fc45b49) | [`HARDENING.md`](https://github.com/chainguard-actions/madhead-semver-utils/blob/v5.1.1/HARDENING.md) |
-| v5.1.2 | [`v5.1.2`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v5.1.2) | [`aef1720`](https://github.com/madhead/semver-utils/commit/aef172024379a2a15a6a09b097406ca7fec306e8) | — |
+| v5.1.2 | [`v5.1.2`](https://github.com/chainguard-actions/madhead-semver-utils/tree/v5.1.2) | [`b1422b4`](https://github.com/madhead/semver-utils/commit/b1422b43403574ed9de5b73bc37b3a33fa63ba48) | [`HARDENING.md`](https://github.com/chainguard-actions/madhead-semver-utils/blob/v5.1.2/HARDENING.md) |
 
 ## Privacy
 
